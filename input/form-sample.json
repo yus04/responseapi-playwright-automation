@@ -1,0 +1,44 @@
+{
+    "applicantType": "individual",
+    "basicInfo": {
+      "fullName": "山田 太郎",
+      "furigana": "ヤマダ タロウ",
+      "gender": "男性",
+      "dateOfBirth": "1985-03-15",
+      "nationality": "日本",
+      "myNumber": "1234-5678-9012"
+    },
+    "contactInfo": {
+      "address": "東京都港区芝公園4-2-8",
+      "phone": "090-1234-5678",
+      "email": "yamada.taro@example.com",
+      "mailingAddress": "同上"
+    },
+    "employmentInfo": {
+      "occupation": "会社員",
+      "employer": "株式会社サンプルリューション",
+      "employerAddress": "東京都千代田区丸の内1-1-1",
+      "annualIncome": 7500000,
+      "yearsEmployed": 5
+    },
+    "accountInfo": {
+      "accountType": "普通預金",
+      "transferAccount": {
+        "bank": "株式会社フィクションバンク",
+        "branch": "渋谷支店",
+        "accountNumber": "1234567"
+      },
+      "usagePurpose": "給与振込・日常生活費決済用"
+    },
+    "identityVerification": {
+      "documentType": "運転免許証",
+      "documentNumber": "123456789012",
+      "submissionMethod": "スマートフォンで写真を撮影しアップロード"
+    },
+    "agreementChecks": {
+      "termsAccepted": true,
+      "antiSocialCheck": true,
+      "electronicDeliveryConsent": true
+    }
+}
+  

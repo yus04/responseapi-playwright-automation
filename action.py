@@ -97,3 +97,18 @@ async def take_screenshot(page):
         print(f"Using cached screenshot from previous successful capture")
         if last_successful_screenshot:
             return last_successful_screenshot
+
+async def save_local_screenshot(page, path: str = "final_screenshot.png", full_page: bool = False):
+    """
+    Take a screenshot and save it to the local filesystem.
+
+    Args:
+        page: Playwright page instance.
+        path: Output file path.
+        full_page: Whether to capture the full page.
+    """
+    try:
+        await page.screenshot(path=path, full_page=full_page)
+        print(f"Saved final screenshot to {path}")
+    except Exception as e:
+        print(f"Failed to save final screenshot: {e}")

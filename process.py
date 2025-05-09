@@ -1,5 +1,5 @@
 import asyncio
-from config import DISPLAY_WIDTH, DISPLAY_HEIGHT, AZURE_OPENAI_MODEL, ITERATIONS
+from config import DISPLAY_WIDTH, DISPLAY_HEIGHT, AZURE_OPENAI_MODEL, ITERATIONS, HEADLESS
 from action import handle_action, take_screenshot
 
 async def process_model_response(client, response, page, max_iterations=ITERATIONS):
@@ -59,13 +59,15 @@ async def process_model_response(client, response, page, max_iterations=ITERATIO
         acknowledged_checks = []
         if hasattr(computer_call, 'pending_safety_checks') and computer_call.pending_safety_checks:
             pending_checks = computer_call.pending_safety_checks
-            print("\nSafety checks required:")
-            for check in pending_checks:
-                print(f"- {check.code}: {check.message}")
-            
-            if input("\nDo you want to proceed? (y/n): ").lower() != 'y':
-                print("Operation cancelled by user.")
-                break
+
+            if not HEADLESS:
+                print("\nSafety checks required:")
+                for check in pending_checks:
+                    print(f"- {check.code}: {check.message}")
+                
+                if input("\nDo you want to proceed? (y/n): ").lower() != 'y':
+                    print("Operation cancelled by user.")
+                    break
             
             acknowledged_checks = pending_checks
         

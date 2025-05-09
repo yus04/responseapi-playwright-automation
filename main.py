@@ -3,8 +3,8 @@ from openai import AzureOpenAI
 from playwright.async_api import async_playwright
 from auth import get_token_provider
 from process import process_model_response
-from action import take_screenshot
-from config import AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_MODEL, DISPLAY_WIDTH, DISPLAY_HEIGHT, AZURE_OPENAI_API_VERSION
+from action import take_screenshot, save_local_screenshot
+from config import AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_MODEL, DISPLAY_WIDTH, DISPLAY_HEIGHT, AZURE_OPENAI_API_VERSION, WEB_URL, HEADLESS, INSTRUCTIONS
         
 async def main():    
     # Initialize OpenAI client
@@ -17,7 +17,7 @@ async def main():
     # Initialize Playwright
     async with async_playwright() as playwright:
         browser = await playwright.chromium.launch(
-            headless=False,
+            headless=HEADLESS,
             args=[f"--window-size={DISPLAY_WIDTH},{DISPLAY_HEIGHT}", "--disable-extensions"]
         )
         
@@ -29,14 +29,18 @@ async def main():
         page = await context.new_page()
         
         # Navigate to starting page
-        await page.goto("https://www.bing.com", wait_until="domcontentloaded")
-        print("Browser initialized to Bing.com")
+        await page.goto(WEB_URL, wait_until="domcontentloaded")
+        print(f"Browser initialized to {WEB_URL}")
         
         # Main interaction loop
         try:
             while True:
                 print("\n" + "="*50)
-                user_input = input("Enter a task to perform (or 'exit' to quit): ")
+                if not HEADLESS:
+                    user_input = input("Enter a task to perform (or 'exit' to quit): ")
+                else:
+                    user_input = "プロンプトに従って、ブラウザを操作してください。"
+                    print(f"User input: {user_input}")
                 
                 if user_input.lower() in ('exit', 'quit'):
                     break
@@ -57,7 +61,7 @@ async def main():
                         "display_height": DISPLAY_HEIGHT,
                         "environment": "browser"
                     }],
-                    instructions = "You are an AI agent with the ability to control a browser. You can control the keyboard and mouse. You take a screenshot after each action to check if your action was successful. Once you have completed the requested task you should stop running and pass back control to your human supervisor.",
+                    instructions = INSTRUCTIONS,
                     input=[{
                         "role": "user",
                         "content": [{
@@ -75,6 +79,10 @@ async def main():
 
                 # Process model actions
                 await process_model_response(client, response, page)
+
+                if HEADLESS:
+                    # exit the loop
+                    break
                 
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -82,6 +90,10 @@ async def main():
             traceback.print_exc()
         
         finally:
+            if HEADLESS:
+                # Save final screenshot before closing the browser
+                await save_local_screenshot(page, "output/final_screenshot.png")
+
             # Close browser
             await context.close()
             await browser.close()
